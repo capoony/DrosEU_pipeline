@@ -17,8 +17,8 @@ Calculate average FST across all loci.
 """) 
 #########################################################   CODE   #########################################################################
 
-parser.add_option("--diff", dest="diff", help="The outout of PopGen_diff.py")
-parser.add_option("--stat", dest="stat", help="The outout of PopGen_diff.py",default=0)
+parser.add_option("--diff", dest="diff", help="The output of PopGen_diff.py")
+parser.add_option("--stat", dest="stat", help="The statistic calculated by PopGen_diff.py",default=0)
 
 parser.add_option_group(group)
 (options, args) = parser.parse_args()
