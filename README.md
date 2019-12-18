@@ -1,12 +1,9 @@
 # DrosEU_pipeline
-The bioinformatics pipeline for the generation and analysis of the DrosEU data of 2014.
+The bioinformatics pipeline for the generation and analysis of the DrosEU data of 2014. Created by the DrosEU consortium on 13/11/17.
 
-#  Created by the DrosEU consortium on 13/11/17.
-#
+## A) trim, map and re-align around InDels
 
-############## A) trim, map and re-align around InDels
-
-## 1) Trim raw FASTQ reads for BQ >18 and Minimum length > 75bp with [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
+### 1) Trim raw FASTQ reads for BQ >18 and Minimum length > 75bp with [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
 
 ```bash
 export PATH=$PATH:scripts/cutadapt-1.8.3/bin
@@ -24,7 +21,7 @@ read1.fq.gz \
 read2.fq.gz
 ```
 
-## 2) map trimmed reads with [bwa](https://sourceforge.net/projects/bio-bwa/files/) and filter for intact pairs with MQ > 20 using [samtools](http://samtools.sourceforge.net/) 
+### 2) map trimmed reads with [bwa](https://sourceforge.net/projects/bio-bwa/files/) and filter for intact pairs with MQ > 20 using [samtools](http://samtools.sourceforge.net/) 
 
 ```bash
 export PATH=$PATH:scripts/samtools-0.1.19
@@ -40,8 +37,9 @@ trimmed-read2.fq.gz \
 -Sbh -q 20 -F 0x100 - > library.bam
 ```
 
-## 3) sort by position
+### 3) sort by position using [picard](https://broadinstitute.github.io/picard/)
 
+```bash
 java \
 -Xmx20g \
 -Dsnappy.disable=true \
@@ -50,9 +48,11 @@ I=library.bam \
 O=library-sort.bam \
 SO=coordinate \
 VALIDATION_STRINGENCY=SILENT
+```
 
-## 4) de-duplicate
+### 4) remove PCR duplicates with [picard](https://broadinstitute.github.io/picard/)
 
+```bash
 java \
 -Xmx20g \
 -Dsnappy.disable=true \
@@ -62,9 +62,11 @@ I=library-sort.bam \
 O=library-dedup.bam \
 M=library-dedup.txt \
 VALIDATION_STRINGENCY=SILENT
+```
 
-## 5) add read group to BAM files
+### 5) add read group tags to BAM files using [picard](https://broadinstitute.github.io/picard/)
 
+```bash
 java -jar -Xmx10g scripts/picard-tools-1.109/AddOrReplaceReadGroups.jar \
 INPUT=librtary-dedup.bam \
 OUTPUT=library-dedup_rg.bam \
@@ -76,25 +78,30 @@ RGSM=sample \
 RGPU=library \
 CREATE_INDEX=true \
 VALIDATION_STRINGENCY=SILENT
+```
 
 ## 6) generate target list of InDel positions
 
 mkdir $out/mapping/realign_list
 
+```bash
 java -jar scripts/GenomeAnalysisTK-3.4-46/GenomeAnalysisTK.jar \
 -T RealignerTargetCreator \
 -R reference.fa \
 -I library-dedup_rg.bam \
 -o library-dedup_rg.list
+```
 
-## 7) re-align around InDels
+## 7) re-align around InDels using [GATK](https://software.broadinstitute.org/gatk/)
 
+```bash
 java -Xmx20g -jar scripts/GenomeAnalysisTK-3.4-46/GenomeAnalysisTK.jar \
 -T IndelRealigner \
 -R reference.fa \
 -I library-dedup_rg.bam \
 -targetIntervals library-dedup_rg.list \
 -o library-dedup_rg_InDel.bam
+```
 
 ############## B) Decontamination of libraries with simulans contamination
 
