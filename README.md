@@ -25,6 +25,7 @@ read2.fq.gz
 
 ```bash
 export PATH=$PATH:scripts/samtools-0.1.19
+
 export PATH=$PATH:scripts/bwa-0.7.15
 
 bwa mem \
@@ -128,6 +129,7 @@ zcat reference/sim_genome_prefix.fa.gz | cat reference.fa - | gzip -c > referenc
 
 ```bash
 export PATH=$PATH:scripts/bam2fastq-1.1.0
+
 bam2fastq -s -o reads/library# library-dedup_rg_InDel.bam
 ```
 
@@ -142,7 +144,7 @@ bwa mem -Mt 20 reference/combined.fa.gz reads/library\_1.gz reads/library\_2.gz 
 ### 6) deconvolute the reads in the original BAM file
 
 ```bash
-python2.7 scripts/python/FixBAM.py \
+python2.7 scripts/FixBAM.py \
 --contaminated library-dedup_rg_InDel.bam \
 --prefix sim_ \
 --detect library_deSim.sam \
