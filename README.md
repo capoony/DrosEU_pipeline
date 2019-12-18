@@ -304,7 +304,7 @@ python scripts/IntronicSnps.py \
 > intron60.sync
 ```
 
-### 2) calculate pairwise *F*<sub>ST<\sub> based on the method of Weir & Cockerham (1984)
+### 2) calculate pairwise *F*<sub>ST<sub> based on the method of Weir & Cockerham (1984)
 
 ```bash
 python scripts/FST.py \
