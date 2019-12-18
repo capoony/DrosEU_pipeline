@@ -1,9 +1,9 @@
-# DrosEU_pipeline
-The bioinformatics pipeline for the generation and analysis of the DrosEU data of 2014. Created by the DrosEU consortium on 13/11/17.
+# DrosEU bioinformatics pipeline
+The bioinformatics pipeline for the generation and analyses of the DrosEU data of 2014. Created by the DrosEU consortium.
 
 ## A) trim, map and re-align around InDels
 
-### 1) Trim raw FASTQ reads for BQ >18 and Minimum length > 75bp with [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
+### 1) Trim raw FASTQ reads for BQ >18 and minimum length > 75bp with [cutadapt](https://cutadapt.readthedocs.io/en/stable/)
 
 ```bash
 export PATH=$PATH:scripts/cutadapt-1.8.3/bin
@@ -21,7 +21,7 @@ read1.fq.gz \
 read2.fq.gz
 ```
 
-### 2) map trimmed reads with [bwa](https://sourceforge.net/projects/bio-bwa/files/) and filter for intact pairs with MQ > 20 using [samtools](http://samtools.sourceforge.net/) 
+### 2) map trimmed reads with [bwa](https://sourceforge.net/projects/bio-bwa/files/) and filter for propper read pairs with MQ > 20 using [samtools](http://samtools.sourceforge.net/) 
 
 ```bash
 export PATH=$PATH:scripts/samtools-0.1.19
@@ -37,7 +37,7 @@ trimmed-read2.fq.gz \
 -Sbh -q 20 -F 0x100 - > library.bam
 ```
 
-### 3) sort by position using [picard](https://broadinstitute.github.io/picard/)
+### 3) sort BAM by reference position using [picard](https://broadinstitute.github.io/picard/)
 
 ```bash
 java \
@@ -103,35 +103,35 @@ java -Xmx20g -jar scripts/GenomeAnalysisTK-3.4-46/GenomeAnalysisTK.jar \
 -o library-dedup_rg_InDel.bam
 ```
 
-## B) Decontamination of libraries with D. simulans contamination
+## B) Decontamination of libraries with *D. simulans* contamination
 
-### 1) obtain simulans genome
+### 1) obtain *D. simulans* genome
 
 ```bash
 wget -O reference/sim_genome.fa http://datadryad.org/bitstream/handle/10255/dryad.62629/dsim-all-chromosome-M252_draft_4-chrnamesok.fa?sequence=1
 ```
 
 
-### 2) add "sim_" to headers
+### 2) add *"sim_"* to FASTA headers
 
 ```bash
 sed 's/>/>sim_/g' reference/sim_genome.fa | gzip -c > reference/sim_genome_prefix.fa.gz
 ```
 
-### 3) combine with melanogaster reference
+### 3) combine with *D. melanogaster* reference
 
 ```bash
 zcat reference/sim_genome_prefix.fa.gz | cat reference.fa - | gzip -c > reference/combined.fa.gz
 ```
 
-### 4) extract reads from BAM file
+### 4) extract high confidence mapped reads from BAM file with [bam2fastq](https://github.com/jts/bam2fastq)
 
 ```bash
 export PATH=$PATH:scripts/bam2fastq-1.1.0
 bam2fastq -s -o reads/library# library-dedup_rg_InDel.bam
 ```
 
-### 5) competitive mapping
+### 5) competitive mapping of extracted reads against combined reference genomes
 
 ```bash
 export PATH=$PATH:scripts/bwa-0.7.15
@@ -139,7 +139,7 @@ export PATH=$PATH:scripts/bwa-0.7.15
 bwa mem -Mt 20 reference/combined.fa.gz reads/library\_1.gz reads/library\_2.gz > library_deSim.sam
 ```
 
-### 6) deconvolute the reads
+### 6) deconvolute the reads in the original BAM file
 
 ```bash
 python2.7 scripts/python/FixBAM.py \
@@ -151,7 +151,7 @@ python2.7 scripts/python/FixBAM.py \
 
 ## C) Merging BAM files and joint SNP calling
 
-### 1) merge BAM files (in BAMlist.txt) into MPILEUP file only retaining nucleotides with BQ >20 and reads with MQ > 20
+### 1) merge BAM files (in BAMlist.txt) in a MPILEUP file only retaining nucleotides with BQ >20 and reads with MQ > 20
 
 ```bash
 export PATH=$PATH:scripts/samtools-0.1.19
@@ -164,9 +164,9 @@ samtools mpileup -B \
 | gzip > DrosEU.mpileup.gz
 ```
 
-### 2) call SNPs with PoolSNP
+### 2) call SNPs with [PoolSNP](https://github.com/capoony/PoolSNP)
 
-See 
+See [documentation](https://github.com/capoony/PoolSNP/blob/master/README.md) of PoolSNP for further details 
 
 ```bash
 bash scripts/PoolSNP/PoolSNP.sh \
@@ -183,7 +183,7 @@ BS=1 \
 output=SNPs
 ```
 
-### 3) identify sites in proximity of InDels
+### 3) identify sites in proximity of InDels with a minimum count of 20 across all samples pooled and mask sites 5bp up- and downstream of InDel.
 
 ```bash
 python scripts/DetectIndels.py \
@@ -193,22 +193,50 @@ python scripts/DetectIndels.py \
 | gzip > InDel-positions_20.txt.gz
 ```
 
-### 4) use Repeatmasker to generate GFF with location of TE's
+### 4) use [Repeatmasker](http://www.repeatmasker.org/) to generate GFF with location of known TE's
+
+#### obtain TE libraries
+
+```bash
+curl -O ftp://ftp.flybase.net/genomes/Drosophila_melanogaster//dmel_r6.10_FB2016_02/fasta/dmel-all-transposon-r6.10.fasta.gz
+curl -O ftp://ftp.flybase.net/genomes/Drosophila_melanogaster//dmel_r6.10_FB2016_02/fasta/dmel-all-chromosome-r6.10.fasta.gz
+```
+
+#### only keep contig name in headers (no spaces)
+
+```bash
+python2.7  scripts/adjust-id.py \
+dmel-all-transposon-r6.10.fasta \
+> dmel-all-transposon-r6.10_fixed-id.fasta
+```
+
+#### repeat mask genome using [Repeatmasker](http://www.repeatmasker.org/)
+
+```bash
+scripts/RepeatMasker \
+-pa 20 \
+--lib dmel-all-transposon-r6.10_fixed-id.fasta \
+--gff \
+--qq \
+--no_is \
+--nolow \
+dmel-all-chromosome-r6.10.fasta
+```
 
 ### 5) filter SNPs around InDels and in TE's from original VCF
 
 ```bash
 python2.7 scripts/FilterPosFromVCF.py \
 --indel InDel-positions_20.txt.gz \
---te te.gff \
+--te dmel-all-chromosome-r6.10.fasta.out.gff \
 --vcf SNPs.vcf.gz \
 | gzip > SNPs_clean.vcf.gz
 ```
 
-## 6) annotate with snpEff
+## 6) annotate with [snpEff](http://snpeff.sourceforge.net/)
 
 ```bash
-java -Xmx4g -jar scripts/snpEff/snpEff.jar \
+java -Xmx4g -jar scripts/snpEff-4.2/snpEff.jar \
 -ud 2000 \
 BDGP6.82 \
 -stats  SNPs_clean.html \
@@ -216,9 +244,9 @@ SNPs_clean.vcf.gz \
 | gzip > SNPs_clean-ann.vcf.gz
 ```
 
-## D) Calculation of unbiased population genetics estimators $\pi$, $\Theta$ and Tajima's *D*
+## D) Calculation of unbiased population genetics estimators Tajima's *pi*, Watterson's *Theta* and Tajima's *D*
 
-### 1) convert the VCF to the sync file format
+### 1) convert the VCF to SYNC file format (see Kofler et al. 2011)
 
 ```bash
 python scripts/VCF2sync.py \
@@ -236,7 +264,7 @@ python scripts/SubsampleSync.py \
 | gzip > SNPs-40x.sync.gz
 ```
 
-### 3) Calculate "true" window-sizes (e.g. for non-overlapping 200kb windows) based on the number of sites that passed the coverage criteria (as calculated from PoolSNP) are not located within TE's and that are not located close to InDels
+### 3) Calculate "true" window-sizes (e.g. for non-overlapping 200kb windows) based on the number of sites that passed the coverage criteria (as calculated from PoolSNP) are not located within TE's and that are not located close to InDels. See Material and Methods in Kapun *et al.* (2018)
 
 ```bash
 python TrueWindows.py \
@@ -362,7 +390,7 @@ write.table(cbind(k$cluster,comp[,1],comp[,2],comp[,3]),file="PCA-scores.txt",ro
 
 ## F) Inversion frequencies and correlations with geographical variables
 
-### 1) obtain Marker-SNP positions in full sync dataset
+### 1) obtain Marker-SNP positions in full SYNC dataset (see Kapun *et al.* 2014 for more details)
 
 ```bash
 python scripts/OverlapSNPs.py \
@@ -390,6 +418,10 @@ python scripts/Test4Correlation.py \
 ```
 
 ## References
+
+Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of Drosophila melanogaster. Molecular Ecology 23:1813–1827.
+
+Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2018. Genomic analysis of European Drosophila populations reveals longitudinal structure and continent-wide selection. bioRxiv Available from: http://biorxiv.org/lookup/doi/10.1101/313759
 
 Kofler R, Pandey RV, Schlotterer C. 2011. PoPoolation2: identifying differentiation between populations using sequencing of pooled DNA samples (Pool-Seq). Bioinformatics 27:3435–3436.
 
