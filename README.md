@@ -248,7 +248,7 @@ python TrueWindows.py \
 --output truewindows
 ```
 
-### 4) Calculate window-wise Population Genetics parameters Pi, Theta and Tajima's D using Pool-Seq corrections following Kofler *et al.* (2011)
+### 4) Calculate window-wise Population Genetics parameters \pi, \Theta and Tajima's D using Pool-Seq corrections following Kofler *et al.* (2011)
 
 ```bash
 python scripts/PopGen_var.py \
@@ -274,7 +274,7 @@ python scripts/IntronicSnps.py \
 > intron60.sync
 ```
 
-### 2) calculate pairwise FST based on the method of Weir and Cockerham 1984
+### 2) calculate pairwise *F*_ST_ based on the method of Weir & Cockerham (1984)
 
 ```bash
 python scripts/FST.py \
@@ -392,6 +392,9 @@ python scripts/Test4Correlation.py \
 ## References
 
 Kofler R, Pandey RV, Schlotterer C. 2011. PoPoolation2: identifying differentiation between populations using sequencing of pooled DNA samples (Pool-Seq). Bioinformatics 27:3435–3436.
+
+Weir BS, Cockerham CC. 1984. Estimating *F*-Statistics for the Analysis of Population Structure. Evolution 38:1358.
+
 
 
 
