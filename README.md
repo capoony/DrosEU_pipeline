@@ -304,7 +304,7 @@ python scripts/IntronicSnps.py \
 > intron60.sync
 ```
 
-### 2) calculate pairwise *F*<sub>ST<sub> based on the method of Weir & Cockerham (1984)
+### 2) calculate pairwise *F*<sub>ST</sub> based on the method of Weir & Cockerham (1984)
 
 ```bash
 python scripts/FST.py \
@@ -315,7 +315,7 @@ python scripts/FST.py \
 | gzip > intron.fst.gz
 ```
 
-### 3) average FST across all loci
+### 3) average *F*<sub>ST</sub> across all loci
 
 ```bash
 python scripts/CombineFST.py \
@@ -411,7 +411,7 @@ python scripts/InvFreq.py \
 > inversion.freq
 ```
 
-## 3) test for correlation of inversion and TE frequencies with geographic variables and account for spatial autocorrelation
+## 3) test for correlations of inversion and TE frequencies with geographic variables and account for spatial autocorrelation
 
 ```bash
 python scripts/Test4Correlation.py \
