@@ -153,7 +153,7 @@ python2.7 scripts/FixBAM.py \
 
 ## C) Merging BAM files and joint SNP calling
 
-### 1) merge BAM files (in BAMlist.txt) in a MPILEUP file only retaining nucleotides with BQ >20 and reads with MQ > 20
+### 1) merge BAM files (in the order of the file paths in BAMlist.txt) in a MPILEUP file only retaining nucleotides with BQ >20 and reads with MQ > 20
 
 ```bash
 export PATH=$PATH:scripts/samtools-0.1.19
@@ -195,7 +195,7 @@ python scripts/DetectIndels.py \
 | gzip > InDel-positions_20.txt.gz
 ```
 
-### 4) use [Repeatmasker](http://www.repeatmasker.org/) to generate GFF with location of known TE's
+### 4) use [Repeatmasker](http://www.repeatmasker.org/) to generate a GFF with location of known TE's
 
 #### obtain TE libraries
 
@@ -212,7 +212,7 @@ dmel-all-transposon-r6.10.fasta \
 > dmel-all-transposon-r6.10_fixed-id.fasta
 ```
 
-#### repeat mask genome using [Repeatmasker](http://www.repeatmasker.org/)
+#### repeat mask *D. melanogaster* genome using [Repeatmasker](http://www.repeatmasker.org/)
 
 ```bash
 scripts/RepeatMasker \
@@ -225,7 +225,7 @@ scripts/RepeatMasker \
 dmel-all-chromosome-r6.10.fasta
 ```
 
-### 5) filter SNPs around InDels and in TE's from original VCF
+### 5) filter SNPs around InDels and in TE's from the original VCF produced with PoolSNP
 
 ```bash
 python2.7 scripts/FilterPosFromVCF.py \
@@ -235,7 +235,7 @@ python2.7 scripts/FilterPosFromVCF.py \
 | gzip > SNPs_clean.vcf.gz
 ```
 
-## 6) annotate with [snpEff](http://snpeff.sourceforge.net/)
+## 6) annotate SNPs with [snpEff](http://snpeff.sourceforge.net/)
 
 ```bash
 java -Xmx4g -jar scripts/snpEff-4.2/snpEff.jar \
@@ -266,10 +266,10 @@ python scripts/SubsampleSync.py \
 | gzip > SNPs-40x.sync.gz
 ```
 
-### 3) Calculate "true" window-sizes (e.g. for non-overlapping 200kb windows) based on the number of sites that passed the coverage criteria (as calculated from PoolSNP) are not located within TE's and that are not located close to InDels. See Material and Methods in Kapun *et al.* (2018)
+### 3) Calculate "true" window-sizes (e.g. for non-overlapping 200kb windows) based on the number of sites that passed the coverage criteria (as calculated from [PoolSNP](https://github.com/capoony/PoolSNP)) are not located within TE's and that are not located close to InDels; See Material and Methods in Kapun *et al.* (2018)
 
 ```bash
-python TrueWindows.py \
+python scripts/TrueWindows.py \
 --badcov SNP_BS.txt.gz \
 --indel InDel-positions_20.txt.gz \
 --te te.gff \
@@ -278,7 +278,7 @@ python TrueWindows.py \
 --output truewindows
 ```
 
-### 4) Calculate window-wise Population Genetics parameters \pi, \Theta and Tajima's D using Pool-Seq corrections following Kofler *et al.* (2011)
+### 4) Calculate window-wise Population Genetics parameters Tajima's *pi*, Watterson's *Theta* and Tajima's *D* using Pool-Seq corrections following Kofler *et al.* (2011)
 
 ```bash
 python scripts/PopGen_var.py \
@@ -294,7 +294,7 @@ python scripts/PopGen_var.py \
 
 ## E) Inference of Demographic patterns
 
-### 1) isolate SNPs located in Introns < 60 bp length
+### 1) isolate SNPs located in Introns < 60 bp length using the *D. melanogaster* genome annotation in GFF file format
 
 ```bash
 python scripts/IntronicSnps.py \
@@ -304,7 +304,7 @@ python scripts/IntronicSnps.py \
 > intron60.sync
 ```
 
-### 2) calculate pairwise *F*_ST_ based on the method of Weir & Cockerham (1984)
+### 2) calculate pairwise *F*<sub>ST<\sub> based on the method of Weir & Cockerham (1984)
 
 ```bash
 python scripts/FST.py \
