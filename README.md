@@ -529,9 +529,13 @@ python scripts/Test4Correlation.py \
 
 ## References
 
-Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of Drosophila melanogaster. Molecular Ecology 23:1813–1827.
+Comeron JM, Ratnappan R, Bailin S. 2012. The Many Landscapes of Recombination in *Drosophila melanogaster*. PLoS Genetics 8:e1002905.
 
-Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2018. Genomic analysis of European Drosophila populations reveals longitudinal structure and continent-wide selection. bioRxiv Available from: http://biorxiv.org/lookup/doi/10.1101/313759
+Corbett-Detig RB, Cardeno C, Langley CH. 2012. Sequence-based detection and breakpoint assembly of polymorphic inversions. Genetics 192:131–137.
+
+Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of *Drosophila melanogaster*. Molecular Ecology 23:1813–1827.
+
+Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2018. Genomic analysis of European *Drosophila* populations reveals longitudinal structure and continent-wide selection. bioRxiv Available from: http://biorxiv.org/lookup/doi/10.1101/313759
 
 Kofler R, Pandey RV, Schlotterer C. 2011. PoPoolation2: identifying differentiation between populations using sequencing of pooled DNA samples (Pool-Seq). Bioinformatics 27:3435–3436.
 
