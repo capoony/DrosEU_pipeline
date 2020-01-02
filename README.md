@@ -294,13 +294,25 @@ python scripts/PopGen_var.py \
 
 ## E) Inference of Demographic patterns
 
-### 1) isolate SNPs located in Introns < 60 bp length using the *D. melanogaster* genome annotation in GFF file format
+### 1) isolate SNPs located in Introns < 60 bp length using the *D. melanogaster* genome annotation in GFF file format and retain only SNPS with a minimum recombination rate >3 (based on Comeron et al. 2012) and in a minimum Distance of 1 mb to the breakpoints of common chromosomal inversions (based on Corbett-Detig et al. 2014).
 
 ```bash
+# identify SNPs inside introns of < 60bp length
+
 python scripts/IntronicSnps.py \
 --gff dmel-all-filtered-r6.09.gff.gz \
 --sync SNPs.sync.gz \
 --target-length 60 \
+> intron60_all.sync
+
+# remove SNPs within and in 1mb distance to chromosomal inversions and with recombination rates <3
+
+python scripts/FilterByRecomRateNInversion.py \
+--inv data/inversions_breakpoints_v5v6.txt \
+--RecRates data/DrosEU-SNPs.recomb.gz \
+--input intron60_all.sync \
+--D 1000000 \
+--r 3 \
 > intron60.sync
 ```
 
@@ -390,6 +402,102 @@ dev.off()
 write.table(cbind(k$cluster,comp[,1],comp[,2],comp[,3]),file="PCA-scores.txt",row.names = T, quote=F)
 ```
 
+### analyse population structure and admixture with the *R* package *conStruct*
+
+```R
+# install.packages("conStruct")
+library(conStruct)
+
+# Load allele frequencies, coordinates of each sampling site and geographic distances in kilometers
+Freq=read.table("intron60-af_freq.txt",header=F)
+CoordRaw=read.table("data/DrosEU-coord.txt",header=T)
+Coord=as.matrix(CoordRaw[,4:3])
+colnames(Coord)=c("Lon","Lat")
+DistRaw=read.table("data/DrosEU-geo.dist",header=T)
+Dist=as.matrix(DistRaw)
+
+# Set working directory
+setwd("/Volumes/MartinResearch2/new2014Analyses/analyses/4fold/construct")
+
+# test values of K ranging from 1 to 10 in 8-fold replication with cross-validation
+my.xvals <- x.validation(train.prop = 0.9,
+    n.reps = 8,
+    K = 1:10,
+    freqs = as.matrix(Freq),
+    data.partitions = NULL,
+    geoDist = Dist,
+    coords = Coord,
+    prefix = "example2",
+    n.iter = 1e3,
+    make.figs = T,
+    save.files = T,
+    parallel = TRUE,
+    n.nodes = 20)
+
+# load both the results for the spatial and non-spation models
+sp.results <- as.matrix(
+    read.table("example2_sp_xval_results.txt",
+    header = TRUE,
+    stringsAsFactors = FALSE))
+nsp.results <- as.matrix(
+    read.table("example2_nsp_xval_results.txt",
+    header = TRUE,
+    stringsAsFactors = FALSE))
+
+# format results from the output list
+sp.results <- Reduce("cbind",lapply(my.xvals,function(x){unlist(x$sp)}),init=NULL)
+nsp.results <- Reduce("cbind",lapply(my.xvals,function(x){unlist(x$nsp)}),init=NULL)
+sp.CIs <- apply(sp.results,1,function(x){mean(x) + c(-1.96,1.96) * sd(x)/length(x)})
+nsp.CIs <- apply(nsp.results,1,function(x){mean(x) + c(-1.96,1.96) * sd(x)/length(x)})
+
+# then, plot cross-validation results for K=1:10 with 8 replicates and visualize results with confidence interval bars
+pdf("cross-validate-sp.pdf",width=4,height=12)
+plot(rowMeans(sp.results),
+pch=19,col="blue",
+ylab="predictive accuracy",xlab="values of K",
+ylim=range(sp.CIs),
+main="spatial cross-validation results")
+segments(x0 = 1:nrow(sp.results),
+y0 = sp.CIs[1,],
+x1 = 1:nrow(sp.results),
+y1 = sp.CIs[2,],
+col = "blue",lwd=2)
+dev.off()
+
+# plot all Admixture plots for values of K ranging from 1:10
+for (i in seq(1,10,1)){
+      my.run <- conStruct(spatial = TRUE,
+            K = i,
+            freqs = as.matrix(Freq),
+            geoDist = Dist,
+            coords = Coord,
+            prefix = paste("test_",i,seq=""),
+            n.chains = 1,
+            n.iter = 1e3,
+            make.figs = T,
+            save.files = T)
+
+      admix.props <- my.run$chain_1$MAP$admix.proportions
+      pdf(paste("STRUCTURE_",i,"_1.pdf"),width=8,height=4)
+      make.structure.plot(admix.proportions = admix.props,
+            sample.names=CoordRaw$node_label,
+            mar = c(6,4,2,2),
+            sort.by=1)
+      dev.off()
+
+      # plot map with pie-charts showing proportion admixture  
+      pdf(paste("AdmPIE_",i,"_1.pdf"),width=9,height=8)
+      maps::map(xlim = range(Coord[,1]) + c(-5,5), ylim = range(Coord[,2])+c(-2,2), col="gray")
+      make.admix.pie.plot(admix.proportions = admix.props,
+            coords = Coord,
+            add = TRUE)
+      box()
+      axis(1)
+      axis(2)
+      dev.off()
+}
+```
+
 ## F) Inversion frequencies and correlations with geographical variables
 
 ### 1) obtain Marker-SNP positions in full SYNC dataset (see Kapun *et al.* 2014 for more details)
@@ -421,9 +529,13 @@ python scripts/Test4Correlation.py \
 
 ## References
 
-Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of Drosophila melanogaster. Molecular Ecology 23:1813–1827.
+Comeron JM, Ratnappan R, Bailin S. 2012. The Many Landscapes of Recombination in *Drosophila melanogaster*. PLoS Genetics 8:e1002905.
 
-Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2018. Genomic analysis of European Drosophila populations reveals longitudinal structure and continent-wide selection. bioRxiv Available from: http://biorxiv.org/lookup/doi/10.1101/313759
+Corbett-Detig RB, Cardeno C, Langley CH. 2012. Sequence-based detection and breakpoint assembly of polymorphic inversions. Genetics 192:131–137.
+
+Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of *Drosophila melanogaster*. Molecular Ecology 23:1813–1827.
+
+Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2018. Genomic analysis of European *Drosophila* populations reveals longitudinal structure and continent-wide selection. bioRxiv Available from: http://biorxiv.org/lookup/doi/10.1101/313759
 
 Kofler R, Pandey RV, Schlotterer C. 2011. PoPoolation2: identifying differentiation between populations using sequencing of pooled DNA samples (Pool-Seq). Bioinformatics 27:3435–3436.
 
