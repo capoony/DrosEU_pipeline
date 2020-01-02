@@ -421,30 +421,28 @@ setwd("/Volumes/MartinResearch2/new2014Analyses/analyses/4fold/construct")
 
 # test values of K ranging from 1 to 10 in 8-fold replication with cross-validation
 my.xvals <- x.validation(train.prop = 0.9,
-n.reps = 8,
-K = 1:10,
-freqs = as.matrix(Freq),
-data.partitions = NULL,
-geoDist = Dist,
-coords = Coord,
-prefix = "example2",
-n.iter = 1e3,
-make.figs = T,
-save.files = T,
-parallel = TRUE,
-n.nodes = 20)
+    n.reps = 8,
+    K = 1:10,
+    freqs = as.matrix(Freq),
+    data.partitions = NULL,
+    geoDist = Dist,
+    coords = Coord,
+    prefix = "example2",
+    n.iter = 1e3,
+    make.figs = T,
+    save.files = T,
+    parallel = TRUE,
+    n.nodes = 20)
 
 # load both the results for the spatial and non-spation models
 sp.results <- as.matrix(
-read.table("example2_sp_xval_results.txt",
-header = TRUE,
-stringsAsFactors = FALSE)
-)
+    read.table("example2_sp_xval_results.txt",
+    header = TRUE,
+    stringsAsFactors = FALSE))
 nsp.results <- as.matrix(
-read.table("example2_nsp_xval_results.txt",
-header = TRUE,
-stringsAsFactors = FALSE)
-)
+    read.table("example2_nsp_xval_results.txt",
+    header = TRUE,
+    stringsAsFactors = FALSE))
 
 # format results from the output list
 sp.results <- Reduce("cbind",lapply(my.xvals,function(x){unlist(x$sp)}),init=NULL)
@@ -468,35 +466,35 @@ dev.off()
 
 # plot all Admixture plots for values of K ranging from 1:10
 for (i in seq(1,10,1)){
-my.run <- conStruct(spatial = TRUE,
-                    K = i,
-                    freqs = as.matrix(Freq),
-                    geoDist = Dist,
-                    coords = Coord,
-                    prefix = paste("test_",i,seq=""),
-                    n.chains = 1,
-                    n.iter = 1e3,
-                    make.figs = T,
-                    save.files = T)
+      my.run <- conStruct(spatial = TRUE,
+            K = i,
+            freqs = as.matrix(Freq),
+            geoDist = Dist,
+            coords = Coord,
+            prefix = paste("test_",i,seq=""),
+            n.chains = 1,
+            n.iter = 1e3,
+            make.figs = T,
+            save.files = T)
 
-admix.props <- my.run$chain_1$MAP$admix.proportions
-pdf(paste("STRUCTURE_",i,"_1.pdf"),width=8,height=4)
-make.structure.plot(admix.proportions = admix.props,
-                    sample.names=CoordRaw$node_label,
-                    mar = c(6,4,2,2),
-                    sort.by=1)
-dev.off()
+      admix.props <- my.run$chain_1$MAP$admix.proportions
+      pdf(paste("STRUCTURE_",i,"_1.pdf"),width=8,height=4)
+      make.structure.plot(admix.proportions = admix.props,
+            sample.names=CoordRaw$node_label,
+            mar = c(6,4,2,2),
+            sort.by=1)
+      dev.off()
 
-# plot map with pie-charts showing proportion admixture  
-pdf(paste("AdmPIE_",i,"_1.pdf"),width=9,height=8)
-maps::map(xlim = range(Coord[,1]) + c(-5,5), ylim = range(Coord[,2])+c(-2,2), col="gray")
-make.admix.pie.plot(admix.proportions = admix.props,
-                    coords = Coord,
-                    add = TRUE)
-box()
-axis(1)
-axis(2)
-dev.off()
+      # plot map with pie-charts showing proportion admixture  
+      pdf(paste("AdmPIE_",i,"_1.pdf"),width=9,height=8)
+      maps::map(xlim = range(Coord[,1]) + c(-5,5), ylim = range(Coord[,2])+c(-2,2), col="gray")
+      make.admix.pie.plot(admix.proportions = admix.props,
+            coords = Coord,
+            add = TRUE)
+      box()
+      axis(1)
+      axis(2)
+      dev.off()
 }
 ```
 
