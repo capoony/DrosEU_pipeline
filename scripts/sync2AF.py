@@ -2,7 +2,7 @@ import sys
 from collections import defaultdict as d
 from optparse import OptionParser, OptionGroup
 
-#Author: Martin Kapun 
+#Author: Martin Kapun
 
 #########################################################   HELP   #########################################################################
 usage="python %prog --input input.sync --output out"
@@ -14,7 +14,7 @@ ____________
 
 Calculates allele frequencies of the major allele for all libraries and stores it in a matrix, where rows are libraries and columns are SNPs.
 
-""") 
+""")
 #########################################################   CODE   #########################################################################
 
 parser.add_option("--output", dest="out", help="The path and name used for the output-file(s)")
@@ -49,7 +49,7 @@ def sync2string(x):
 def sync2freqh(x):
 	''' convert string in SYNC format to dictionary of freqencies where x is a string in sync format'''
 	from collections import defaultdict as d
-	
+
 	nuc=["A","T","C","G"]
 	counts=map(int,x.split(":")[:4])
 	CO=dict(zip(*[nuc,counts]))
@@ -58,17 +58,17 @@ def sync2freqh(x):
 		return "NA"
 	for k,v in CO.items():
 		h[k]=v/float(sum(CO.values()))
-		
+
 	return h,sum(CO.values())
 
 def load_data(x):
 	''' import data either from a gzipped or or uncrompessed file or from STDIN'''
-	import gzip			
+	import gzip
 	if x=="-":
 		y=sys.stdin
 	elif x.endswith(".gz"):
 		y=gzip.open(x,"r")
-	else: 
+	else:
 		y=open(x,"r")
 	return y
 
