@@ -498,7 +498,7 @@ for (i in seq(1,10,1)){
 }
 ```
 
-## F) Correlation with climatic variation using the WorlClim dataset (Hijmans *et al.* 2005) 
+## F) Correlation with climatic variation using the WorldClim dataset (Hijmans *et al.* 2005) 
 
 ### 1) obtain climatic data
 
@@ -521,7 +521,7 @@ bio.data<-cbind(geod,bio)
 # save into external file
 write.table(bio.data,file="data/climate.txt",sep="\t", row.names=FALSE ,quote=FALSE)
 ```
-### 2) 
+### 2) calculate PCA 
 
 ```R
 #read csv file with geographic coordinates
