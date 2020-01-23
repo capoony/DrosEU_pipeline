@@ -498,36 +498,64 @@ for (i in seq(1,10,1)){
 }
 ```
 
-## G) Correlation with climatic variation using the WorlClim dataset (Hijmans *et al.* 2005) 
+## F) Correlation with climatic variation using the WorlClim dataset (Hijmans *et al.* 2005) 
+
+### 1) obtain climatic data
 
 ```R
 # load raster package
 library(raster)
 
 # first load WC bio variables at the resolution of 2.5 deg
-biod <- getData('worldclim', var='bio', res=2.5)
-tmind <- getData('worldclim', var='tmin', res=2.5)
-tmaxd <- getData('worldclim', var='tmax', res=2.5)
-precd <- getData('worldclim', var='prec', res=2.5)
+biod <- getData("worldclim", var="bio", res=2.5)
 
 # read csv file with geographic coordinates
-geod<-read.table('data/MetaData.txt', header=T, stringsAsFactors=F)
+geod<-read.table("data/DrosEU-coord.txt", header=T)
 
 # extact for each coordinate bio clim variables
 bio<-extract(biod, geod[,c(4,3)])
-tmin<-extract(tmind, geod[,c(4,3)])
-tmax<-extract(tmaxd, geod[,c(4,3)])
-precd<-extract(precd, geod[,c(4,3)])
 
 # create a full dataset
-bio.data<-cbind(geod,bio,tmin,tmax,precd)
+bio.data<-cbind(geod,bio)
 
 # save into external file
-write.table(bio.data,file='data/MetaData-climate.txt',sep='\t', row.names=FALSE ,quote=FALSE)
+write.table(bio.data,file="data/climate.txt",sep="\t", row.names=FALSE ,quote=FALSE)
+```
+### 2) 
 
+```R
+#read csv file with geographic coordinates
+geod<-read.table("data/climate.txt", header=T)
 
+# get variance and mean for PCA
+library(FactoMineR)
 
-## F) Inversion frequencies and correlations with geographical variables
+# prepare dataset
+geo<-geod[,5:nrow(geod)]
+rownames(geo)<-geod[,2]
+
+# do PCA
+pca<-PCA(geo)
+
+# make Figures
+pdf("data/climate_scree.pdf",width=6,height=6)
+layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE),widths=c(2,3), heights=c(1.5,1))
+plot(pca)
+barplot(pca$eig[,1],ylab="Eigenvalues",names.arg=1:nrow(pca$eig),xlab="Principal components")
+abline(h=1,col="blue")
+barplot(pca$eig[,3],names.arg=1:nrow(pca$eig),ylab="variance explained",xlab="Principal components")
+abline(h=80,col="blue")
+dev.off()
+
+# export loadings
+cat(capture.output(pca$var$coord),file="data/climate.rot",sep="")
+
+# export PC axes
+bio.data<-cbind(geod,pca$ind$coord)
+write.table(bio.data,file="data/climate_PCA.txt",sep="\t", row.names=FALSE ,quote=FALSE)
+```
+
+## G) Inversion frequencies and correlations with geographical variables
 
 ### 1) obtain Marker-SNP positions in full SYNC dataset (see Kapun *et al.* 2014 for more details)
 
