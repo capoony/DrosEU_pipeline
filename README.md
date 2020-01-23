@@ -281,7 +281,7 @@ python scripts/TrueWindows.py \
 ### 4) Calculate window-wise Population Genetics parameters Tajima's *pi*, Watterson's *Theta* and Tajima's *D* using Pool-Seq corrections following Kofler *et al.* (2011)
 
 ```bash
-python scripts/PopGen_var.py \
+python scripts/PoolGen_var.py \
 --input SNPs-40x.sync.gz \
 --pool-size 80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,80,66,80,80,80,80,80,80,80,80,70,80,80,80 \
 --min-count 2 \
