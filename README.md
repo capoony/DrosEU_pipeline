@@ -498,6 +498,35 @@ for (i in seq(1,10,1)){
 }
 ```
 
+## G) Correlation with climatic variation using the WorlClim dataset (Hijmans *et al.* 2005) 
+
+```R
+# load raster package
+library(raster)
+
+# first load WC bio variables at the resolution of 2.5 deg
+biod <- getData('worldclim', var='bio', res=2.5)
+tmind <- getData('worldclim', var='tmin', res=2.5)
+tmaxd <- getData('worldclim', var='tmax', res=2.5)
+precd <- getData('worldclim', var='prec', res=2.5)
+
+# read csv file with geographic coordinates
+geod<-read.table('data/MetaData.txt', header=T, stringsAsFactors=F)
+
+# extact for each coordinate bio clim variables
+bio<-extract(biod, geod[,c(4,3)])
+tmin<-extract(tmind, geod[,c(4,3)])
+tmax<-extract(tmaxd, geod[,c(4,3)])
+precd<-extract(precd, geod[,c(4,3)])
+
+# create a full dataset
+bio.data<-cbind(geod,bio,tmin,tmax,precd)
+
+# save into external file
+write.table(bio.data,file='data/MetaData-climate.txt',sep='\t', row.names=FALSE ,quote=FALSE)
+
+
+
 ## F) Inversion frequencies and correlations with geographical variables
 
 ### 1) obtain Marker-SNP positions in full SYNC dataset (see Kapun *et al.* 2014 for more details)
@@ -532,6 +561,8 @@ python scripts/Test4Correlation.py \
 Comeron JM, Ratnappan R, Bailin S. 2012. The Many Landscapes of Recombination in *Drosophila melanogaster*. PLoS Genetics 8:e1002905.
 
 Corbett-Detig RB, Cardeno C, Langley CH. 2012. Sequence-based detection and breakpoint assembly of polymorphic inversions. Genetics 192:131–137.
+
+Hijmans RJ, Cameron SE, Parra JL, Jones PG, Jarvis A. 2005. Very high resolution interpolated climate surfaces for global land areas. International Journal of Climatology 25:1965–1978.
 
 Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of *Drosophila melanogaster*. Molecular Ecology 23:1813–1827.
 
