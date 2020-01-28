@@ -554,6 +554,37 @@ cat(capture.output(pca$var$coord),file="data/climate.rot",sep="")
 bio.data<-cbind(geod,pca$ind$coord)
 write.table(bio.data,file="data/climate_PCA.txt",sep="\t", row.names=FALSE ,quote=FALSE)
 ```
+### 3) convert vcf file to bscan input files (python 2.7, requires PvVCF (https://pyvcf.readthedocs.io/en/latest/))
+```bash
+scripts/vcf2Bscan.py -filename SNPs.vcf.gz \
+	-qual 15 \
+	-depth 10 \
+	-task bscan \
+	-prefix bscan_2R \
+	-region 2R
+```
+
+### 4) run BayeScEnv
+```bash
+bayescenv SNPs.in \
+	-pilot 1000 \
+	-npb 5 \
+	-n 2000 \
+	-env env_var.txt \
+	-od ~/path/to/output/dir/
+```
+
+### 5) run GOwinda for top snps
+```bash
+gowinda --output-file pc1 \
+	--annotation-file dmel-all-r6.12.gtf \
+	--snp-file AllSNPS.vcf \
+	--candidate-snp-file topSNPs.bed \
+	--gene-set-file Dmel_funcassociate_go_associations.txt \
+	--simulations 1000000 \
+	--gene-definition updownstream2000 \
+	--threads 3
+```
 
 ## G) Inversion frequencies and correlations with geographical variables
 
