@@ -591,7 +591,7 @@ gowinda --output-file pc1 \
 ### 1) obtain Marker-SNP positions in full SYNC dataset (see Kapun *et al.* 2014 for more details)
 
 ```bash
-python scripts/OverlapSNPs.py \
+python3 scripts/OverlapSNPs.py \
 --source data/inversion_markers_v6.txt_pos \
 --target SNPs.sync.gz \
 > inversion_markers.sync
@@ -600,7 +600,7 @@ python scripts/OverlapSNPs.py \
 ### 2) calculate inversion frequencies based on inversion-specific marker SNPs
 
 ```bash
-python scripts/InvFreq.py \
+python3 scripts/InvFreq.py \
 --sync inversion_markers.sync \
 --meta data/MetaData.txt \
 --inv data/inversion_markers_v6.txt \
@@ -610,7 +610,7 @@ python scripts/InvFreq.py \
 ## 3) test for correlations of inversion and TE frequencies with geographic variables and account for spatial autocorrelation
 
 ```bash
-python scripts/Test4Correlation.py \
+python3 scripts/Test4Correlation.py \
 --meta data/MetaData.txt \
 > Correlation.test
 ```
