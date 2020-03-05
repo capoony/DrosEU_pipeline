@@ -607,7 +607,7 @@ python3 scripts/InvFreq.py \
 > inversion.freq
 ```
 
-## 3) test for correlations of inversion and TE frequencies with geographic variables and account for spatial autocorrelation
+### 3) test for correlations of inversion and TE frequencies with geographic variables and account for spatial autocorrelation
 
 ```bash
 python3 scripts/Test4Correlation.py \
@@ -678,7 +678,7 @@ python pool-hmm.py --prefix $name-X -n 80 --pred -k 0.000000000000001 -s $name-a
 python read_stat_pool-hmm.py *.stat
 ```
 
-### 6) Bedtools to get the genes inside our candidate selective sweeps
+### 6) Bedtools to get the genes inside our candidate selective sweeps (Bedtools v2.27.1)
 Concatenate all chromosome bed files for the same sample and run bedtools with Drosophila melanogaster v.6.12 annotation file
 
 ```bash 
