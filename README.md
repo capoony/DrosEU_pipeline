@@ -615,7 +615,101 @@ python3 scripts/Test4Correlation.py \
 > Correlation.test
 ```
 
+## H) Selective sweeps
+
+### 1) Compute pileups from bam files
+
+```bash
+samtools mpileup \
+      -B \
+      -f holo_dmel_6.12.fa \ 
+      -q 20 \
+      -Q 20 \
+      $bamfile \
+      > $out/$name.mpileup
+```
+
+### 2) Separate pileup files by chromosome
+
+```awk
+awk '$1 == "2L" {print $0}' $name.pileup > $name-2L.pileup
+awk '$1 == "2R" {print $0}' $name.pileup > $name-2R.pileup
+awk '$1 == "3L" {print $0}' $name.pileup > $name-3L.pileup
+awk '$1 == "3R" {print $0}' $name.pileup > $name-3R.pileup
+awk '$1 == "4" {print $0}' $name.pileup > $name-4.pileup
+awk '$1 == "X" {print $0}' $name.pileup > $name-X.pileup
+```
+
+### 3) Run Pool-hmm for SFS (requires pool-hmm 1.4.4)
+
+```bash
+python pool-hmm.py \
+      --prefix $name \ # Name associated to each sample and each chromosome
+      -n 80 \ # Depending on the sample size
+      --only-spectrum \ 
+      --theta 0.005 \
+      -r 100
+```
+
+### 4) Run Pool-hmm for sweep detection (requires pool-hmm 1.4.4)
+--pred: for prediction of selective window
+-k 0.000000000000001: per site transition probability between hidden states (more restrictive as lower); this changed depending on the sample used
+-s: spectrum file
+-e: phred quality (required sanger for new illumina reads)
+outputs: $name.post, $name.pred, $name.segemit, $name.stat
+
+```bash
+python pool-hmm.py --prefix $name-2L -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
+python pool-hmm.py --prefix $name-2R -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
+python pool-hmm.py --prefix $name-3L -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
+python pool-hmm.py --prefix $name-3R -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
+python pool-hmm.py --prefix $name-4 -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
+python pool-hmm.py --prefix $name-X -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
+```
+
+### 5) Transform Pool-hmm stat files into bed files (Python 2.7)
+
+```bash 
+python read_stat_pool-hmm.py *.stat
+```
+
+### 6) Bedtools to get the genes inside our candidate selective sweeps
+Concatenate all chromosome bed files for the same sample and run bedtools with Drosophila melanogaster v.6.12 annotation file
+
+```bash 
+cat *.bed
+bedtools intersect -a dmel-all-r6.12_FlyBase_genes_nopseudo.bed -b sample.bed > sammple_flybase.txt 
+```
+
+### 7) Look for genes overlapping among samples and populations
+all_sample_genes.txt contains a list of all genes obtained in all populations
+sampleXXX_genes.txt: genes found for each sample
+
+Overlap among samples; output is a: FBgn*_samples.txt; containing information of samples where the FBgnXXX gene was found
+
+```bash
+while read p; do
+      grep "$p" sampleXXX_genes.txt > "$p"_samples.txt
+      done <all_sample_genes.txt
+```
+
+# Overlap among populations (Python 2.7)
+
+```bash
+python genes_per_population.py \
+      FBgn*_samples.txt
+```
+
+### 9) Calculate average Tajima's D in the 30 samples included for the analysis (Python 2.7)
+
+```bash
+python average_window_tajimasd.py
+```
+
+
 ## References
+
+Boitard S, Kofler R, Françoise P, Robelin D, Schlötterer C, Futschik A (2013) Pool-hmm: a Python program for estimating the allele frequency spectrum and detecting selective sweeps from next generation sequencing of pooled samples. Mol Ecol Resour, 13, 337–340. 
 
 Comeron JM, Ratnappan R, Bailin S. 2012. The Many Landscapes of Recombination in *Drosophila melanogaster*. PLoS Genetics 8:e1002905.
 
