@@ -699,7 +699,7 @@ while read p; do
       done <all_sample_genes.txt
 ```
 
-# Overlap among populations (Python 2.7)
+Overlap among populations (Python 2.7)
 
 ```bash
 python genes_per_population.py \
