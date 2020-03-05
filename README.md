@@ -653,10 +653,15 @@ python pool-hmm.py \
 
 ### 4) Run Pool-hmm for sweep detection (requires pool-hmm 1.4.4)
 --pred: for prediction of selective window
+
 -k 0.000000000000001: per site transition probability between hidden states (more restrictive as lower); this changed depending on the sample used
+
 -s: spectrum file
+
 -e: phred quality (required sanger for new illumina reads)
+
 outputs: $name.post, $name.pred, $name.segemit, $name.stat
+
 
 ```bash
 python pool-hmm.py --prefix $name-2L -n 80 --pred -k 0.000000000000001 -s $name-all -e sanger
@@ -683,6 +688,7 @@ bedtools intersect -a dmel-all-r6.12_FlyBase_genes_nopseudo.bed -b sample.bed > 
 
 ### 7) Look for genes overlapping among samples and populations
 all_sample_genes.txt contains a list of all genes obtained in all populations
+
 sampleXXX_genes.txt: genes found for each sample
 
 Overlap among samples; output is a: FBgn*_samples.txt; containing information of samples where the FBgnXXX gene was found
