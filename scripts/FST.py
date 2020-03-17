@@ -154,7 +154,7 @@ for l in load_data(options.sync):
             ys=sync2string(pops[j])
             py,ny=string2freqh(ys)
       
-            ## calculate FST Nei
+            ## calculate FST Weir Cockerham
             FSTw=FST_wc(px[A],py[A],float(Sample[i]),float(Sample[j]))
             if nx<int(options.m) or ny <int(options.m):
                 stat.append(str(i+1)+":"+str(j+1)+"=NA")
