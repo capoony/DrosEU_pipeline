@@ -644,7 +644,7 @@ awk '$1 == "X" {print $0}' $name.pileup > $name-X.pileup
 
 ```bash
 python pool-hmm.py \
-      --prefix $name \ # Name associated to each sample and each chromosome
+      --prefix $name-all \ # Name associated to each sample
       -n 80 \ # Depending on the sample size
       --only-spectrum \ 
       --theta 0.005 \
