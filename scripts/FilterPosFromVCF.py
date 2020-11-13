@@ -38,14 +38,14 @@ def load_data(x):
 
 exclude=d(lambda:d(str))
 
-if options.indel!="NA":
+if options.indel is not None:
     for l in load_data(options.indel):
         if len(l.split())<2:
                continue
         C,P=l.split()
         exclude[C][int(P)]
 
-if options.te!="NA":
+if options.te is not None:
     for l in load_data(options.te):
         if l.startswith("#"):
             continue
