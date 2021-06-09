@@ -266,7 +266,7 @@ python scripts/SubsampleSync.py \
 | gzip > SNPs-40x.sync.gz
 ```
 
-### 3) Calculate "true" window-sizes (e.g. for non-overlapping 200kb windows) based on the number of sites that passed the coverage criteria (as calculated from [PoolSNP](https://github.com/capoony/PoolSNP)) are not located within TE's and that are not located close to InDels; See Material and Methods in Kapun *et al.* (2018)
+### 3) Calculate "true" window-sizes (e.g. for non-overlapping 200kb windows) based on the number of sites that passed the coverage criteria (as calculated from [PoolSNP](https://github.com/capoony/PoolSNP)) are not located within TE's and that are not located close to InDels; See Material and Methods in [Kapun *et al.* (2020)](https://academic.oup.com/mbe/article/37/9/2661/5837682)
 
 ```bash
 python scripts/TrueWindows.py \
@@ -725,7 +725,7 @@ Hijmans RJ, Cameron SE, Parra JL, Jones PG, Jarvis A. 2005. Very high resolution
 
 Kapun M, van Schalkwyk H, Bryant M, Flatt T, Schlötterer C. 2014. Inference of chromosomal inversion dynamics from Pool-Seq data in natural and laboratory populations of *Drosophila melanogaster*. Molecular Ecology 23:1813–1827.
 
-Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2018. Genomic analysis of European *Drosophila* populations reveals longitudinal structure and continent-wide selection. bioRxiv Available from: http://biorxiv.org/lookup/doi/10.1101/313759
+Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabelli O, Kankare M, Haudry A, Wiberg RAW, et al. 2020. Genomic analysis of European *Drosophila* populations reveals longitudinal structure and continent-wide selection. Molecular Biology and Evolution 27:2661–2678. Available from: https://academic.oup.com/mbe/article/37/9/2661/5837682
 
 Kofler R, Pandey RV, Schlotterer C. 2011. PoPoolation2: identifying differentiation between populations using sequencing of pooled DNA samples (Pool-Seq). Bioinformatics 27:3435–3436.
 
