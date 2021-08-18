@@ -1,5 +1,6 @@
 # DrosEU bioinformatics pipeline
-The bioinformatics pipeline for the generation and analyses of the DrosEU data of 2014. Created by the DrosEU consortium.
+The bioinformatics pipeline for the generation and analyses of the DrosEU data from 2014. This pipeline was created by the DrosEU consortium. Please check out our accompanying paper: Kapun, M., Barrón, M. G., Staubach, F., Obbard, D. J., Wiberg, R. A. W., Vieira, J., … González, J. (2020). Genomic Analysis of European Drosophila melanogaster Populations Reveals Longitudinal Structure, Continent-Wide Selection, and Previously Unknown DNA Viruses. Molecular Biology and Evolution, 37(9), 2661–2678. doi: [10.1093/molbev/msaa120](https://academic.oup.com/mbe/article/37/9/2661/5837682)
+
 
 ## A) trim, map and re-align around InDels
 
@@ -21,7 +22,7 @@ read1.fq.gz \
 read2.fq.gz
 ```
 
-### 2) map trimmed reads with [bwa](https://sourceforge.net/projects/bio-bwa/files/) and filter for propper read pairs with MQ > 20 using [samtools](http://samtools.sourceforge.net/) 
+### 2) map trimmed reads with [bwa](https://sourceforge.net/projects/bio-bwa/files/) and filter for propper read pairs with MQ > 20 using [samtools](http://samtools.sourceforge.net/)
 
 ```bash
 export PATH=$PATH:scripts/samtools-0.1.19
@@ -168,7 +169,7 @@ samtools mpileup -B \
 
 ### 2) call SNPs with [PoolSNP](https://github.com/capoony/PoolSNP)
 
-See [documentation](https://github.com/capoony/PoolSNP/blob/master/README.md) of PoolSNP for further details 
+See [documentation](https://github.com/capoony/PoolSNP/blob/master/README.md) of PoolSNP for further details
 
 ```bash
 bash scripts/PoolSNP/PoolSNP.sh \
@@ -498,7 +499,7 @@ for (i in seq(1,10,1)){
 }
 ```
 
-## F) Correlation with climatic variation using the WorldClim dataset (Hijmans *et al.* 2005) 
+## F) Correlation with climatic variation using the WorldClim dataset (Hijmans *et al.* 2005)
 
 ### 1) obtain climatic data
 
@@ -521,7 +522,7 @@ bio.data<-cbind(geod,bio)
 # save into external file
 write.table(bio.data,file="data/climate.txt",sep="\t", row.names=FALSE ,quote=FALSE)
 ```
-### 2) calculate PCA 
+### 2) calculate PCA
 
 ```R
 #read csv file with geographic coordinates
@@ -622,7 +623,7 @@ python3 scripts/Test4Correlation.py \
 ```bash
 samtools mpileup \
       -B \
-      -f holo_dmel_6.12.fa \ 
+      -f holo_dmel_6.12.fa \
       -q 20 \
       -Q 20 \
       $bamfile \
@@ -646,7 +647,7 @@ awk '$1 == "X" {print $0}' $name.pileup > $name-X.pileup
 python pool-hmm.py \
       --prefix $name-all \ # Name associated to each sample
       -n 80 \ # Depending on the sample size
-      --only-spectrum \ 
+      --only-spectrum \
       --theta 0.005 \
       -r 100
 ```
@@ -674,16 +675,16 @@ python pool-hmm.py --prefix $name-X -n 80 --pred -k 0.000000000000001 -s $name-a
 
 ### 5) Transform Pool-hmm stat files into bed files (Python 2.7)
 
-```bash 
+```bash
 python read_stat_pool-hmm.py *.stat
 ```
 
 ### 6) Bedtools to get the genes inside our candidate selective sweeps (Bedtools v2.27.1)
 Concatenate all chromosome bed files for the same sample and run bedtools with Drosophila melanogaster v.6.12 annotation file
 
-```bash 
+```bash
 cat *.bed
-bedtools intersect -a dmel-all-r6.12_FlyBase_genes_nopseudo.bed -b sample.bed > sammple_flybase.txt 
+bedtools intersect -a dmel-all-r6.12_FlyBase_genes_nopseudo.bed -b sample.bed > sammple_flybase.txt
 ```
 
 ### 7) Look for genes overlapping among samples and populations
@@ -715,7 +716,7 @@ python average_window_tajimasd.py
 
 ## References
 
-Boitard S, Kofler R, Françoise P, Robelin D, Schlötterer C, Futschik A (2013) Pool-hmm: a Python program for estimating the allele frequency spectrum and detecting selective sweeps from next generation sequencing of pooled samples. Mol Ecol Resour, 13, 337–340. 
+Boitard S, Kofler R, Françoise P, Robelin D, Schlötterer C, Futschik A (2013) Pool-hmm: a Python program for estimating the allele frequency spectrum and detecting selective sweeps from next generation sequencing of pooled samples. Mol Ecol Resour, 13, 337–340.
 
 Comeron JM, Ratnappan R, Bailin S. 2012. The Many Landscapes of Recombination in *Drosophila melanogaster*. PLoS Genetics 8:e1002905.
 
@@ -730,7 +731,3 @@ Kapun M, Barron Aduriz MG, Staubach F, Vieira J, Obbard D, Goubert C, Rota Stabe
 Kofler R, Pandey RV, Schlotterer C. 2011. PoPoolation2: identifying differentiation between populations using sequencing of pooled DNA samples (Pool-Seq). Bioinformatics 27:3435–3436.
 
 Weir BS, Cockerham CC. 1984. Estimating *F*-Statistics for the Analysis of Population Structure. Evolution 38:1358.
-
-
-
-
