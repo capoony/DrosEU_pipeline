@@ -1,5 +1,8 @@
 # DrosEU bioinformatics pipeline
-The bioinformatics pipeline for the generation and analyses of the DrosEU data from 2014. This pipeline was created by the DrosEU consortium. Please check out our accompanying paper: Kapun, M., Barrón, M. G., Staubach, F., Obbard, D. J., Wiberg, R. A. W., Vieira, J., … González, J. (2020). Genomic Analysis of European Drosophila melanogaster Populations Reveals Longitudinal Structure, Continent-Wide Selection, and Previously Unknown DNA Viruses. Molecular Biology and Evolution, 37(9), 2661–2678. doi: [10.1093/molbev/msaa120](https://academic.oup.com/mbe/article/37/9/2661/5837682)
+The bioinformatics pipeline for the generation and analyses of the DrosEU data from 2014. This pipeline was created by the DrosEU consortium.
+Please check out our accompanying paper:
+
+Kapun, M., Barrón, M. G., Staubach, F., Obbard, D. J., Wiberg, R. A. W., Vieira, J., … González, J. (2020). Genomic Analysis of European Drosophila melanogaster Populations Reveals Longitudinal Structure, Continent-Wide Selection, and Previously Unknown DNA Viruses. Molecular Biology and Evolution, 37(9), 2661–2678. doi: [10.1093/molbev/msaa120](https://academic.oup.com/mbe/article/37/9/2661/5837682)
 
 
 ## A) trim, map and re-align around InDels
