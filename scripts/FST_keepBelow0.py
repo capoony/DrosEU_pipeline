@@ -10,13 +10,15 @@ import gzip
 
 usage = "python %prog --input input.sync --minimum-count 2 --minimum-cov 10 --pool-size 20,30,20 > output.fst"
 parser = OptionParser(usage=usage)
-group = OptionGroup(parser,
-                    '''
+group = OptionGroup(
+    parser,
+    """
 H E L P:
 ____________
 
 Calculate pairwise FST among all populations in the input sync file. Only consider site with an coverage > minimum-cov (--minimum-cov) and an allele-count > minimum-count (--minium-count)
-''')
+""",
+)
 #########################################################   CODE   #########################################################################
 
 parser.add_option("--input", dest="sync",
@@ -25,16 +27,18 @@ parser.add_option("--minimum-count", dest="b",
                   help="minimum allele count", default=2)
 parser.add_option("--minimum-cov", dest="m",
                   help="minimum coverage", default=10)
-parser.add_option("--pool-size", dest="s",
-                  help="comma separated list of chromosomes in the pools")
+parser.add_option(
+    "--pool-size", dest="s", help="comma separated list of chromosomes in the pools"
+)
 
 parser.add_option_group(group)
 (options, args) = parser.parse_args()
 
 
 def load_data(x):
-    ''' import data either from a gzipped or or uncrompessed file or from STDIN'''
+    """ import data either from a gzipped or or uncrompessed file or from STDIN"""
     import gzip
+
     if x == "-":
         y = sys.stdin
     elif x.endswith(".gz"):
@@ -45,7 +49,7 @@ def load_data(x):
 
 
 def sync2string(x):
-    ''' convert sync format to string of nucleotides  where x is a string in sync format '''
+    """ convert sync format to string of nucleotides  where x is a string in sync format """
     string = ""
     if x == ".:.:.:.:.:." or x == "0:0:0:0:0:0":
         return "na"
@@ -57,8 +61,9 @@ def sync2string(x):
 
 
 def string2freqh(x):
-    ''' convert string of nucleotides to dictionary of freqencies where x is a string of nucleotides'''
+    """ convert string of nucleotides to dictionary of freqencies where x is a string of nucleotides"""
     from collections import defaultdict as d
+
     if x == "" or x == "na":
         return "na", "na"
     counts = d(int)
@@ -75,7 +80,7 @@ def string2freqh(x):
 
 
 def sync2counth(x):
-    ''' convert string in sync format to dictionary of counts where x is a string in sync format'''
+    """ convert string in sync format to dictionary of counts where x is a string in sync format"""
     nuc = ["A", "T", "C", "G"]
     if x == ".:.:.:.:.:." or x == "0:0:0:0:0:0":
         return "na"
@@ -84,7 +89,7 @@ def sync2counth(x):
 
 
 def counth2freqh(x):
-    ''' calculate freq-list from counts in dictionary'''
+    """ calculate freq-list from counts in dictionary"""
     from collections import defaultdict as d
 
     h = d(float)
@@ -94,8 +99,9 @@ def counth2freqh(x):
 
 
 def getAlleles(v):
-    ''' get major and minor allele from all populations'''
+    """ get major and minor allele from all populations"""
     from collections import Counter
+
     allnuc = ""
     for po in v:
         allnuc += sync2string(po)
@@ -108,7 +114,7 @@ def getAlleles(v):
 
 
 def FST_wc(p1, p2, n1, n2):
-    '''see Bahtia et al. (2013) Genome Research - eq. 6'''
+    """see Bahtia et al. (2013) Genome Research - eq. 6"""
     if n1 + n2 <= 2:
         return "NA"
     nom1 = (n1 * n2) / (n1 + n2)
@@ -117,7 +123,7 @@ def FST_wc(p1, p2, n1, n2):
     nom = 2 * nom1 * nom2 * nom3
 
     denom1 = n1 * n2 / (n1 + n2)
-    denom2 = (p1 - p2)**2
+    denom2 = (p1 - p2) ** 2
     denom3 = (2 * (n1 * n2 / (n1 + n2))) - 1
     denom4 = 1 / (n1 + n2 - 2)
     denom5 = n1 * p1 * (1 - p1) + n2 * p2 * (1 - p2)
@@ -127,8 +133,10 @@ def FST_wc(p1, p2, n1, n2):
         return "NA"
 
     FST = 1 - (nom / denom)
-    if FST < 0:
-        return 0.0
+
+    # @Mike and Pete; here is the critical code bit, which I now removed. Hope this helps
+    # if FST < 0:
+    #     return 0.0
     return FST
 
 
